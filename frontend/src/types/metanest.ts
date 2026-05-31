@@ -17,10 +17,16 @@ export interface Room {
 
 export interface Opening {
   id: string;
-  type: 'door' | 'window';
+  type: 'door' | 'window' | 'bed' | 'toilet' | 'sink' | 'stove' | 'dining_table';
   center: Point2D;
   width: number;
   wall_index?: number | null;
+  confidence: number;
+}
+
+export interface TextLabel {
+  text: string;
+  bbox: Point2D[];
   confidence: number;
 }
 
@@ -32,6 +38,7 @@ export interface LayoutAnalysis {
   rooms: Room[];
   doors: Opening[];
   windows: Opening[];
+  text_labels?: TextLabel[];
   metadata: Record<string, unknown>;
 }
 
@@ -41,6 +48,18 @@ export interface MaterialSettings {
   ceiling_color: string;
   theme: string;
   sunlight: boolean;
+}
+
+export type ViewMode = 'orbit' | 'first-person' | 'top';
+
+export interface TexturePreset {
+  id: MaterialSettings['floor_texture'];
+  label: string;
+  category: 'floor' | 'wall' | 'ceiling';
+  color: string;
+  roughness: number;
+  metalness: number;
+  description: string;
 }
 
 export interface ScenePayload {
@@ -57,6 +76,7 @@ export interface ScenePayload {
   rooms: Room[];
   doors: Opening[];
   windows: Opening[];
+  text_labels?: TextLabel[];
   materials: MaterialSettings;
   features: Record<string, boolean>;
 }
@@ -76,4 +96,3 @@ export interface Project {
   created_at: string;
   updated_at: string;
 }
-
