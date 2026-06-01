@@ -1,4 +1,4 @@
-import type { MaterialSettings, Project } from '../types/metanest';
+import type { MaterialSettings, Project, TexturePreset } from '../types/metanest';
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000';
 
@@ -55,6 +55,9 @@ export const api = {
   async listProjects(): Promise<Project[]> {
     return parseResponse<Project[]>(await fetch(`${API_URL}/projects`));
   },
+  async listTextures(): Promise<TexturePreset[]> {
+    return parseResponse<TexturePreset[]>(await fetch(`${API_URL}/textures`));
+  },
   async updateMaterials(projectId: string, materials: MaterialSettings): Promise<Project> {
     return parseResponse<Project>(
       await fetch(`${API_URL}/projects/${projectId}/materials`, {
@@ -69,4 +72,3 @@ export const api = {
     return `${API_URL}${path}`;
   },
 };
-
