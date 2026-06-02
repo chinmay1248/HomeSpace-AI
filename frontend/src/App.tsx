@@ -1,30 +1,34 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { AlertTriangle, BrainCircuit, CheckCircle2, Loader2 } from 'lucide-react';
 import { AppShell } from './components/layout/AppShell';
 import { ProjectSidebar } from './components/layout/ProjectSidebar';
 import { UploadDropzone } from './components/upload/UploadDropzone';
-import { HouseViewer, type ViewMode } from './components/viewer/HouseViewer';
+import { HouseViewer } from './components/viewer/HouseViewer';
 import { api } from './services/api';
-import type { MaterialSettings, Project } from './types/metanest';
+import { useMetaNestStore } from './store/useMetaNestStore';
+import type { MaterialSettings } from './types/metanest';
 import { demoScene } from './utils/demoLayout';
 
-const defaultMaterials: MaterialSettings = {
-  wall_color: '#E8F3FF',
-  floor_texture: 'wood',
-  ceiling_color: '#F8FBFF',
-  theme: 'aurora',
-  sunlight: true,
-};
-
 export default function App() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [activeProject, setActiveProject] = useState<Project | null>(null);
-  const [materials, setMaterials] = useState<MaterialSettings>(defaultMaterials);
-  const [viewMode, setViewMode] = useState<ViewMode>('orbit');
-  const [progress, setProgress] = useState(0);
-  const [stage, setStage] = useState('Ready');
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const projects = useMetaNestStore((state) => state.projects);
+  const activeProject = useMetaNestStore((state) => state.activeProject);
+  const materials = useMetaNestStore((state) => state.materials);
+  const texturePresets = useMetaNestStore((state) => state.texturePresets);
+  const viewMode = useMetaNestStore((state) => state.viewMode);
+  const progress = useMetaNestStore((state) => state.progress);
+  const stage = useMetaNestStore((state) => state.stage);
+  const busy = useMetaNestStore((state) => state.busy);
+  const error = useMetaNestStore((state) => state.error);
+  const setProjects = useMetaNestStore((state) => state.setProjects);
+  const upsertProject = useMetaNestStore((state) => state.upsertProject);
+  const setActiveProject = useMetaNestStore((state) => state.setActiveProject);
+  const setMaterials = useMetaNestStore((state) => state.setMaterials);
+  const setTexturePresets = useMetaNestStore((state) => state.setTexturePresets);
+  const setViewMode = useMetaNestStore((state) => state.setViewMode);
+  const setProgress = useMetaNestStore((state) => state.setProgress);
+  const setStage = useMetaNestStore((state) => state.setStage);
+  const setBusy = useMetaNestStore((state) => state.setBusy);
+  const setError = useMetaNestStore((state) => state.setError);
 
   const activeScene = useMemo(() => {
     if (activeProject?.scene) {
@@ -46,7 +50,8 @@ export default function App() {
       .catch(() => {
         setStage('Offline demo mode');
       });
-  }, []);
+    api.listTextures().then(setTexturePresets).catch(() => undefined);
+  }, [setMaterials, setProjects, setActiveProject, setStage, setTexturePresets]);
 
   async function handleUpload(file: File) {
     setBusy(true);
@@ -55,19 +60,19 @@ export default function App() {
     setStage('Uploading source plan');
     try {
       const uploaded = await api.upload(file, (nextProgress) => setProgress(Math.min(nextProgress, 35)));
-      setProjects((items) => [uploaded, ...items.filter((item) => item.id !== uploaded.id)]);
+      upsertProject(uploaded);
       setActiveProject(uploaded);
 
       setStage('Running OpenCV analysis');
       setProgress(48);
       const analyzed = await api.analyze(uploaded.id);
-      setProjects((items) => [analyzed, ...items.filter((item) => item.id !== analyzed.id)]);
+      upsertProject(analyzed);
       setActiveProject(analyzed);
 
       setStage('Generating 3D metaverse');
       setProgress(76);
       const generated = await api.generate3d(analyzed.id);
-      setProjects((items) => [generated, ...items.filter((item) => item.id !== generated.id)]);
+      upsertProject(generated);
       setActiveProject(generated);
       setMaterials(generated.materials);
       setProgress(100);
@@ -89,7 +94,7 @@ export default function App() {
     try {
       const updated = await api.updateMaterials(activeProject.id, nextMaterials);
       setActiveProject(updated);
-      setProjects((items) => [updated, ...items.filter((item) => item.id !== updated.id)]);
+      upsertProject(updated);
     } catch {
       setStage('Materials changed locally');
     }
@@ -136,6 +141,7 @@ export default function App() {
           projects={projects}
           activeProject={activeProject}
           materials={materials}
+          texturePresets={texturePresets}
           onSelectProject={(project) => {
             setActiveProject(project);
             setMaterials(project.materials);
@@ -158,4 +164,3 @@ function Metric({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
-

@@ -1,26 +1,36 @@
 import { Building2, CheckCircle2, Clock3, Database, Download, Palette, Sparkles } from 'lucide-react';
-import type { MaterialSettings, Project } from '../../types/metanest';
+import type { MaterialSettings, Project, TexturePreset } from '../../types/metanest';
 
 interface ProjectSidebarProps {
   projects: Project[];
   activeProject: Project | null;
   materials: MaterialSettings;
+  texturePresets: TexturePreset[];
   onSelectProject: (project: Project) => void;
   onMaterialsChange: (materials: MaterialSettings) => void;
   onExport: () => void;
 }
 
-const textures: MaterialSettings['floor_texture'][] = ['wood', 'marble', 'tiles', 'concrete', 'paint'];
+const fallbackTextures: TexturePreset[] = [
+  { id: 'wood', label: 'Warm Oak', category: 'floor', color: '#A8763E', roughness: 0.46, metalness: 0.02, description: 'Warm wood floor preset.' },
+  { id: 'marble', label: 'White Marble', category: 'floor', color: '#E7EDF4', roughness: 0.28, metalness: 0.02, description: 'Bright marble-like floor preset.' },
+  { id: 'tiles', label: 'Ceramic Tile', category: 'floor', color: '#9AB8C2', roughness: 0.38, metalness: 0.02, description: 'Cool tile preset.' },
+  { id: 'concrete', label: 'Soft Concrete', category: 'floor', color: '#737B82', roughness: 0.72, metalness: 0.02, description: 'Neutral concrete preset.' },
+  { id: 'paint', label: 'Matte Paint', category: 'floor', color: '#C7F9CC', roughness: 0.84, metalness: 0.02, description: 'Soft matte painted surface.' },
+];
 const wallColors = ['#E8F3FF', '#F5D0FE', '#D9F99D', '#FDE68A', '#CBD5E1', '#FED7AA'];
 
 export function ProjectSidebar({
   projects,
   activeProject,
   materials,
+  texturePresets,
   onSelectProject,
   onMaterialsChange,
   onExport,
 }: ProjectSidebarProps) {
+  const floorTextures = (texturePresets.length ? texturePresets : fallbackTextures).filter((texture) => texture.category === 'floor');
+
   return (
     <aside className="space-y-5">
       <section className="glass rounded-lg p-4">
@@ -91,9 +101,9 @@ export function ProjectSidebar({
               onChange={(event) => onMaterialsChange({ ...materials, floor_texture: event.target.value as MaterialSettings['floor_texture'] })}
               className="w-full rounded-md border border-white/10 bg-slate-950/80 px-3 py-2 text-sm text-white outline-none focus:border-teal-300"
             >
-              {textures.map((texture) => (
-                <option key={texture} value={texture}>
-                  {texture}
+              {floorTextures.map((texture) => (
+                <option key={texture.id} value={texture.id}>
+                  {texture.label}
                 </option>
               ))}
             </select>
@@ -140,4 +150,3 @@ function Status({ status }: { status: Project['status'] }) {
     </span>
   );
 }
-
