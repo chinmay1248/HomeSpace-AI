@@ -3,9 +3,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { ContactShadows, Html, OrbitControls, PointerLockControls, Sky, Text } from '@react-three/drei';
 import { Color, DoubleSide, Vector3 } from 'three';
 import { Eye, Footprints, Maximize2 } from 'lucide-react';
-import type { MaterialSettings, Point2D, Room, ScenePayload, Wall } from '../../types/metanest';
-
-export type ViewMode = 'orbit' | 'first-person' | 'top';
+import type { MaterialSettings, Point2D, Room, ScenePayload, ViewMode, Wall } from '../../types/metanest';
 
 interface HouseViewerProps {
   scene: ScenePayload;
