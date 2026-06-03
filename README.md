@@ -77,6 +77,16 @@ npm run dev
 
 The app will run at `http://localhost:5173`.
 
+## Demo Assets
+
+The repo includes synthetic demo floor plans, YOLO labels, and room masks under `docs/demo-assets/dummy_raw`. See `docs/DEMO.md` for a local end-to-end walkthrough.
+
+To regenerate the sample set:
+
+```bash
+python backend/scripts/generate_dummy_data.py --output docs/demo-assets/dummy_raw --num-images 3
+```
+
 ## API
 
 - `GET /health` - service health check
@@ -91,6 +101,8 @@ The app will run at `http://localhost:5173`.
 ## Optional AI Training
 
 The default MVP runs with OpenCV and rule-based geometry, which keeps local setup light. To train or run learned detectors, install the AI extras:
+
+See `docs/AI_TRAINING_NEXT_STEPS.md` for the production training checklist.
 
 ```bash
 cd backend
