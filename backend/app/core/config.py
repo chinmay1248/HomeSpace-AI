@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     data_dir: str = "data"
     mongodb_uri: str | None = None
     mongodb_database: str = "metanest"
+    yolo_opening_model_path: str | None = None
+    unet_room_model_path: str | None = None
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
@@ -36,4 +38,3 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
-
