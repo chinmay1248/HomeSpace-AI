@@ -22,6 +22,7 @@ for (const config of viewports) {
   await page.goto(appUrl, { waitUntil: 'networkidle' });
   const canvas = page.locator('canvas').first();
   await canvas.waitFor({ timeout: 15000 });
+  await waitForRenderedCanvas(canvas);
   await page.screenshot({ path: fileURLToPath(new URL(`${config.name}.png`, outputDir)), fullPage: true });
   const canvasPng = await canvas.screenshot({ path: fileURLToPath(new URL(`${config.name}-canvas.png`, outputDir)) });
   const pixelStats = analyzePng(canvasPng);
@@ -36,6 +37,17 @@ const failed = results.filter((result) => !result.ok);
 console.table(results);
 if (failed.length) {
   throw new Error(`Canvas verification failed: ${JSON.stringify(failed)}`);
+}
+
+async function waitForRenderedCanvas(canvas) {
+  let lastStats = null;
+  for (let attempt = 0; attempt < 30; attempt += 1) {
+    const canvasPng = await canvas.screenshot();
+    lastStats = analyzePng(canvasPng);
+    if (lastStats.ok) return;
+    await canvas.page().waitForTimeout(500);
+  }
+  throw new Error(`Canvas did not finish rendering: ${JSON.stringify(lastStats)}`);
 }
 
 function analyzePng(buffer) {
