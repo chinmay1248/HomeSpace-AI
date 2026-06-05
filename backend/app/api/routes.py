@@ -12,11 +12,13 @@ from app.models.schemas import (
     MaterialUpdateRequest,
     Project,
     ProjectStatus,
+    TexturePreset,
     UploadResponse,
 )
 from app.services.file_service import FileService
 from app.services.floorplan_analyzer import FloorPlanAnalyzer
 from app.services.scene_generator import SceneGenerator
+from app.services.texture_catalog import TextureCatalog
 from app.storage.project_repository import ProjectRepository, create_repository
 
 router = APIRouter()
@@ -59,10 +61,11 @@ async def upload_floor_plan(
 @router.post("/analyze", response_model=Project)
 def analyze_floor_plan(
     payload: AnalyzeRequest,
+    settings: Settings = Depends(get_settings),
     repository: ProjectRepository = Depends(get_repository),
 ) -> Project:
     project = _get_project_or_404(repository, payload.project_id)
-    analyzer = FloorPlanAnalyzer()
+    analyzer = FloorPlanAnalyzer(settings.yolo_opening_model_path, settings.unet_room_model_path)
     try:
         project.layout = analyzer.analyze(Path(project.file_path))
         project.status = ProjectStatus.analyzed
@@ -96,6 +99,11 @@ def list_projects(repository: ProjectRepository = Depends(get_repository)) -> li
     return repository.list()
 
 
+@router.get("/textures", response_model=list[TexturePreset])
+def list_textures() -> list[TexturePreset]:
+    return TextureCatalog().list_presets()
+
+
 @router.get("/projects/{project_id}", response_model=Project)
 def get_project(project_id: str, repository: ProjectRepository = Depends(get_repository)) -> Project:
     return _get_project_or_404(repository, project_id)
@@ -122,4 +130,3 @@ def _get_project_or_404(repository: ProjectRepository, project_id: str) -> Proje
     if project is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found.")
     return project
-

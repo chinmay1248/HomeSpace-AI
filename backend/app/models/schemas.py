@@ -25,11 +25,17 @@ class Room(BaseModel):
 
 class Opening(BaseModel):
     id: str
-    type: Literal["door", "window"]
+    type: Literal["door", "window", "bed", "toilet", "sink", "stove", "dining_table"]
     center: Point2D
     width: float
     wall_index: int | None = None
     confidence: float = Field(default=0.45, ge=0, le=1)
+
+
+class TextLabel(BaseModel):
+    text: str
+    bbox: list[Point2D]
+    confidence: float = Field(default=1.0, ge=0, le=1)
 
 
 class LayoutAnalysis(BaseModel):
@@ -40,6 +46,7 @@ class LayoutAnalysis(BaseModel):
     rooms: list[Room]
     doors: list[Opening] = []
     windows: list[Opening] = []
+    text_labels: list[TextLabel] = []
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
@@ -49,6 +56,16 @@ class MaterialSettings(BaseModel):
     ceiling_color: str = "#F8FBFF"
     theme: str = "aurora"
     sunlight: bool = True
+
+
+class TexturePreset(BaseModel):
+    id: str
+    label: str
+    category: Literal["floor", "wall", "ceiling"]
+    color: str
+    roughness: float = Field(default=0.55, ge=0, le=1)
+    metalness: float = Field(default=0.02, ge=0, le=1)
+    description: str
 
 
 class ProjectStatus(str, Enum):
@@ -89,4 +106,3 @@ class Generate3DRequest(BaseModel):
 class MaterialUpdateRequest(BaseModel):
     project_id: str
     materials: MaterialSettings
-
