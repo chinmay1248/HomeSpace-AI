@@ -8,10 +8,17 @@ import cv2
 import fitz
 import numpy as np
 
-from app.models.schemas import LayoutAnalysis, Opening, Room, Wall
+from app.ai.opening_detector import YOLOOpeningDetector
+from app.ai.room_segmenter import UNetRoomSegmenter
+from app.models.schemas import LayoutAnalysis, Opening, Room, Wall, TextLabel
+from app.ai.ocr_reader import ocr_reader
 
 
 class FloorPlanAnalyzer:
+    def __init__(self, yolo_opening_model_path: str | None = None, unet_room_model_path: str | None = None) -> None:
+        self.opening_detector = YOLOOpeningDetector(yolo_opening_model_path)
+        self.room_segmenter = UNetRoomSegmenter(unet_room_model_path)
+
     def analyze(self, file_path: Path) -> LayoutAnalysis:
         image = self._load_image(file_path)
         height, width = image.shape[:2]
@@ -32,6 +39,28 @@ class FloorPlanAnalyzer:
         walls = self._detect_walls(edges, width, height)
         rooms = self._detect_rooms(cleaned, width, height)
         doors, windows = self._detect_openings(walls, rooms)
+        ai_metadata: dict[str, object] = {"opening_detector": "heuristic", "room_segmenter": "contour"}
+        text_labels = []
+
+        if self.opening_detector.enabled and file_path.suffix.lower() != ".pdf":
+            model_doors, model_windows = self.opening_detector.detect(file_path, self._scale(width, height))
+            if model_doors or model_windows:
+                doors, windows = model_doors, model_windows
+                ai_metadata["opening_detector"] = "yolov8"
+
+        if self.room_segmenter.enabled and file_path.suffix.lower() != ".pdf":
+            mask = self.room_segmenter.predict_mask(file_path)
+            if mask is not None:
+                ai_metadata["room_segmenter"] = "unet"
+                ai_metadata["segmentation_classes"] = int(mask.max()) + 1
+
+        if file_path.suffix.lower() != ".pdf":
+            extracted_data = ocr_reader.extract_text(image)
+            if extracted_data:
+                ai_metadata["ocr"] = "easyocr"
+                for data in extracted_data:
+                    scaled_bbox = [self._normalize((int(x), int(y)), width, height) for x, y in data["bbox"]]
+                    text_labels.append(TextLabel(text=data["text"], bbox=scaled_bbox, confidence=data["confidence"]))
 
         return LayoutAnalysis(
             source_size=(width, height),
@@ -40,11 +69,13 @@ class FloorPlanAnalyzer:
             rooms=rooms,
             doors=doors,
             windows=windows,
+            text_labels=text_labels,
             metadata={
                 "edge_pixels": int(np.count_nonzero(edges)),
                 "wall_count": len(walls),
                 "room_count": len(rooms),
-                "pipeline": "grayscale-threshold-canny-hough-contour",
+                "pipeline": "hybrid-heuristic-ai",
+                **ai_metadata,
             },
         )
 
@@ -237,4 +268,3 @@ class FloorPlanAnalyzer:
             Wall(start=(w, h), end=(0, h), confidence=0.3),
             Wall(start=(0, h), end=(0, 0), confidence=0.3),
         ]
-
