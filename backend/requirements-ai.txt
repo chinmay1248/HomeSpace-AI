@@ -1,0 +1,6 @@
+-r requirements.txt
+ultralytics>=8.3
+torch>=2.5
+torchvision>=0.20
+tqdm>=4.67
+easyocr>=1.7
