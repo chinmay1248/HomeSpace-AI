@@ -18,3 +18,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--size", default=512, type=int, help="Square image size in pixels.")
     return parser.parse_args()
 
+
+def generate_dummy_data(output_dir: Path, num_images: int = 5, size: int = 512) -> None:
+    images_dir = output_dir / "images"
+    labels_dir = output_dir / "labels"
+    masks_dir = output_dir / "masks"
