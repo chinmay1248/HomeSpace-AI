@@ -23,3 +23,8 @@ def generate_dummy_data(output_dir: Path, num_images: int = 5, size: int = 512) 
     images_dir = output_dir / "images"
     labels_dir = output_dir / "labels"
     masks_dir = output_dir / "masks"
+
+    images_dir.mkdir(parents=True, exist_ok=True)
+    labels_dir.mkdir(parents=True, exist_ok=True)
+    masks_dir.mkdir(parents=True, exist_ok=True)
+
