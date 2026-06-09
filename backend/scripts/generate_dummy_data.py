@@ -43,3 +43,8 @@ def generate_dummy_data(output_dir: Path, num_images: int = 5, size: int = 512) 
         mask[margin:outer_max, margin:room_split] = 3
         mask[margin:outer_max, room_split:outer_max] = 5
         cv2.rectangle(mask, (margin, margin), (outer_max, outer_max), 1, wall_width)
+        cv2.line(mask, (room_split, margin), (room_split, outer_max), 1, wall_width)
+
+        door_top = int(size * 0.39)
+        door_bottom = int(size * 0.49)
+        opening_half_width = max(8, size // 48)
