@@ -38,3 +38,8 @@ def generate_dummy_data(output_dir: Path, num_images: int = 5, size: int = 512) 
         mask = np.zeros((size, size), dtype=np.uint8)
 
         cv2.rectangle(img, (margin, margin), (outer_max, outer_max), (0, 0, 0), wall_width)
+        cv2.line(img, (room_split, margin), (room_split, outer_max), (0, 0, 0), wall_width)
+
+        mask[margin:outer_max, margin:room_split] = 3
+        mask[margin:outer_max, room_split:outer_max] = 5
+        cv2.rectangle(mask, (margin, margin), (outer_max, outer_max), 1, wall_width)
