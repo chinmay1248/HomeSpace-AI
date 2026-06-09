@@ -33,3 +33,8 @@ def generate_dummy_data(output_dir: Path, num_images: int = 5, size: int = 512) 
     outer_max = size - margin
     wall_width = max(3, size // 128)
 
+    for index in range(num_images):
+        img = np.ones((size, size, 3), dtype=np.uint8) * 255
+        mask = np.zeros((size, size), dtype=np.uint8)
+
+        cv2.rectangle(img, (margin, margin), (outer_max, outer_max), (0, 0, 0), wall_width)
