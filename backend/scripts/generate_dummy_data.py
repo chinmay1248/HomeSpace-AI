@@ -53,3 +53,8 @@ def generate_dummy_data(output_dir: Path, num_images: int = 5, size: int = 512) 
 
         cv2.rectangle(
             img,
+            (room_split - opening_half_width, door_top),
+            (room_split + opening_half_width, door_bottom),
+            (255, 0, 0),
+            -1,
+        )
