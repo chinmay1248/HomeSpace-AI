@@ -58,3 +58,8 @@ def generate_dummy_data(output_dir: Path, num_images: int = 5, size: int = 512) 
             (255, 0, 0),
             -1,
         )
+        cv2.rectangle(
+            img,
+            (margin - opening_half_width, window_top),
+            (margin + opening_half_width, window_bottom),
+            (0, 255, 0),
