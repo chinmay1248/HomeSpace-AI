@@ -48,3 +48,8 @@ def generate_dummy_data(output_dir: Path, num_images: int = 5, size: int = 512) 
         door_top = int(size * 0.39)
         door_bottom = int(size * 0.49)
         opening_half_width = max(8, size // 48)
+        window_top = int(size * 0.59)
+        window_bottom = int(size * 0.68)
+
+        cv2.rectangle(
+            img,
