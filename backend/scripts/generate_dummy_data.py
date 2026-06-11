@@ -63,3 +63,8 @@ def generate_dummy_data(output_dir: Path, num_images: int = 5, size: int = 512) 
             (margin - opening_half_width, window_top),
             (margin + opening_half_width, window_bottom),
             (0, 255, 0),
+            -1,
+        )
+
+        door_cx = room_split / size
+        door_cy = ((door_top + door_bottom) / 2) / size
