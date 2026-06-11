@@ -73,3 +73,8 @@ def generate_dummy_data(output_dir: Path, num_images: int = 5, size: int = 512) 
         window_cx = margin / size
         window_cy = ((window_top + window_bottom) / 2) / size
         window_w = (opening_half_width * 2) / size
+        window_h = (window_bottom - window_top) / size
+        labels_content = f"0 {door_cx} {door_cy} {door_w} {door_h}\n1 {window_cx} {window_cy} {window_w} {window_h}\n"
+
+        cv2.imwrite(str(images_dir / f"dummy_{index}.png"), img)
+        cv2.imwrite(str(masks_dir / f"dummy_{index}.png"), mask)
