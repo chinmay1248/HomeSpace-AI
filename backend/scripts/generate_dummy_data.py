@@ -83,3 +83,8 @@ def generate_dummy_data(output_dir: Path, num_images: int = 5, size: int = 512) 
 
 def main() -> None:
     args = parse_args()
+    generate_dummy_data(args.output, num_images=args.num_images, size=args.size)
+    print(f"Generated {args.num_images} dummy images, masks, and labels at {args.output.resolve()}")
+
+
+if __name__ == "__main__":
