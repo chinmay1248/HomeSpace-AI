@@ -78,3 +78,8 @@ def generate_dummy_data(output_dir: Path, num_images: int = 5, size: int = 512) 
 
         cv2.imwrite(str(images_dir / f"dummy_{index}.png"), img)
         cv2.imwrite(str(masks_dir / f"dummy_{index}.png"), mask)
+        (labels_dir / f"dummy_{index}.txt").write_text(labels_content, encoding="utf-8")
+
+
+def main() -> None:
+    args = parse_args()
