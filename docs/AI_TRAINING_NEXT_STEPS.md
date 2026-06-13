@@ -17,3 +17,8 @@ Prepare the YOLO dataset:
 
 ```bash
 cd backend
+python scripts/preprocess_cubicasa_openings.py --images E:\datasets\metanest\images --labels E:\datasets\metanest\labels --output data\openings
+```
+
+Train YOLOv8:
+
