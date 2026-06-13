@@ -7,3 +7,8 @@ The MVP works with OpenCV heuristics and optional model wrappers. Use this check
 1. Download a floor-plan dataset such as CubiCasa5K or Structured3D.
 2. Keep source data outside the repo, for example under `E:\datasets\metanest`.
 3. Normalize labels into:
+   - YOLO boxes for doors and windows
+   - segmentation masks for room classes
+4. Use the synthetic assets in `docs/demo-assets/dummy_raw` only for smoke tests, not for production training.
+
+## Door And Window Detection
