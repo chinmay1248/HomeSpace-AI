@@ -12,3 +12,8 @@ The MVP works with OpenCV heuristics and optional model wrappers. Use this check
 4. Use the synthetic assets in `docs/demo-assets/dummy_raw` only for smoke tests, not for production training.
 
 ## Door And Window Detection
+
+Prepare the YOLO dataset:
+
+```bash
+cd backend
