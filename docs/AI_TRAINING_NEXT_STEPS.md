@@ -27,3 +27,8 @@ python scripts/train_yolo_openings.py --data data\openings\dataset.yaml --epochs
 ```
 
 Run a single-image inference check:
+
+```bash
+python scripts/infer_yolo_openings.py --image path\to\sample.png --model runs\metanest-openings\floor-plan-symbols\weights\best.pt
+```
+
