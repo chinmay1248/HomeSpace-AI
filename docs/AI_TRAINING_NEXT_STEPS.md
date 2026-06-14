@@ -22,3 +22,8 @@ python scripts/preprocess_cubicasa_openings.py --images E:\datasets\metanest\ima
 
 Train YOLOv8:
 
+```bash
+python scripts/train_yolo_openings.py --data data\openings\dataset.yaml --epochs 80
+```
+
+Run a single-image inference check:
