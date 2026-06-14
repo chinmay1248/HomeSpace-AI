@@ -32,3 +32,8 @@ Run a single-image inference check:
 python scripts/infer_yolo_openings.py --image path\to\sample.png --model runs\metanest-openings\floor-plan-symbols\weights\best.pt
 ```
 
+## Room Segmentation
+
+Train the U-Net room segmenter:
+
+```bash
