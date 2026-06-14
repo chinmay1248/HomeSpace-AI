@@ -37,3 +37,8 @@ python scripts/infer_yolo_openings.py --image path\to\sample.png --model runs\me
 Train the U-Net room segmenter:
 
 ```bash
+cd backend
+python scripts/train_unet_rooms.py --images E:\datasets\metanest\images --masks E:\datasets\metanest\masks --output models\unet_rooms.pt
+```
+
+Run a single-image inference check:
