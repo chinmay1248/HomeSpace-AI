@@ -57,3 +57,8 @@ UNET_ROOM_MODEL_PATH=models/unet_rooms.pt
 ```
 
 Then rerun:
+
+```bash
+cd backend
+pytest
+```
