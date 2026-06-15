@@ -42,3 +42,8 @@ python scripts/train_unet_rooms.py --images E:\datasets\metanest\images --masks 
 ```
 
 Run a single-image inference check:
+
+```bash
+python scripts/infer_unet_rooms.py --image path\to\sample.png --model models\unet_rooms.pt --output room_mask.png
+```
+
