@@ -52,3 +52,8 @@ python scripts/infer_unet_rooms.py --image path\to\sample.png --model models\une
 Set these values in `backend/.env` after training:
 
 ```env
+YOLO_OPENING_MODEL_PATH=runs/metanest-openings/floor-plan-symbols/weights/best.pt
+UNET_ROOM_MODEL_PATH=models/unet_rooms.pt
+```
+
+Then rerun:
