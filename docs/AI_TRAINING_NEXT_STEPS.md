@@ -47,3 +47,8 @@ Run a single-image inference check:
 python scripts/infer_unet_rooms.py --image path\to\sample.png --model models\unet_rooms.pt --output room_mask.png
 ```
 
+## Enable Models
+
+Set these values in `backend/.env` after training:
+
+```env
