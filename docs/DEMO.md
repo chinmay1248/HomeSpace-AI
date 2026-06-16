@@ -11,3 +11,8 @@ Use this guide to run a local end-to-end demo with the included synthetic floor-
 ## Start The App
 
 From one terminal:
+
+```bash
+cd backend
+uvicorn app.main:app --reload --port 8000
+```
