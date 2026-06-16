@@ -62,3 +62,5 @@ Then rerun:
 cd backend
 pytest
 ```
+
+Use real floor-plan uploads to compare model output against the OpenCV fallback before deploying.
