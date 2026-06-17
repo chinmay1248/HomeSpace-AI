@@ -28,3 +28,7 @@ Open `http://localhost:5173`.
 
 ## Demo Flow
 
+1. Upload `docs/demo-assets/dummy_raw/images/dummy_0.png`.
+2. Wait for the upload preview and project record to appear.
+3. Run analysis to extract walls, rooms, doors, and windows.
+4. Generate the 3D scene from the analyzed layout.
