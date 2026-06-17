@@ -24,3 +24,7 @@ cd frontend
 npm run dev
 ```
 
+Open `http://localhost:5173`.
+
+## Demo Flow
+
