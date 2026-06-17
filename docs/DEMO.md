@@ -16,3 +16,7 @@ From one terminal:
 cd backend
 uvicorn app.main:app --reload --port 8000
 ```
+
+From a second terminal:
+
+```bash
