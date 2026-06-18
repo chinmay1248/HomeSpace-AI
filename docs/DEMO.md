@@ -36,3 +36,7 @@ Open `http://localhost:5173`.
 6. Adjust wall material, floor material, and sunlight settings.
 7. Export the generated scene JSON for review or handoff.
 
+## Included Assets
+
+- `docs/demo-assets/dummy_raw/images` contains simple synthetic floor-plan images.
+- `docs/demo-assets/dummy_raw/labels` contains YOLO-format door/window labels.
