@@ -40,3 +40,7 @@ Open `http://localhost:5173`.
 
 - `docs/demo-assets/dummy_raw/images` contains simple synthetic floor-plan images.
 - `docs/demo-assets/dummy_raw/labels` contains YOLO-format door/window labels.
+- `docs/demo-assets/dummy_raw/masks` contains U-Net-style room masks.
+
+Regenerate the assets with:
+
