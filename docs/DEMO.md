@@ -32,3 +32,7 @@ Open `http://localhost:5173`.
 2. Wait for the upload preview and project record to appear.
 3. Run analysis to extract walls, rooms, doors, and windows.
 4. Generate the 3D scene from the analyzed layout.
+5. Switch between orbit, top-view, and first-person modes.
+6. Adjust wall material, floor material, and sunlight settings.
+7. Export the generated scene JSON for review or handoff.
+
