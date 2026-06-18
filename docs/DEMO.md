@@ -44,3 +44,7 @@ Open `http://localhost:5173`.
 
 Regenerate the assets with:
 
+```bash
+python backend/scripts/generate_dummy_data.py --output docs/demo-assets/dummy_raw --num-images 3
+```
+
