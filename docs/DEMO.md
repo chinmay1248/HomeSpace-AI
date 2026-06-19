@@ -56,3 +56,7 @@ Run the backend smoke tests:
 cd backend
 pytest
 ```
+
+Run the frontend production build:
+
+```bash
