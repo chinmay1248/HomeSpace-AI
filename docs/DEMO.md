@@ -48,3 +48,7 @@ Regenerate the assets with:
 python backend/scripts/generate_dummy_data.py --output docs/demo-assets/dummy_raw --num-images 3
 ```
 
+## Verification
+
+Run the backend smoke tests:
+
