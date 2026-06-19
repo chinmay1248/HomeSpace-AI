@@ -52,3 +52,7 @@ python backend/scripts/generate_dummy_data.py --output docs/demo-assets/dummy_ra
 
 Run the backend smoke tests:
 
+```bash
+cd backend
+pytest
+```
