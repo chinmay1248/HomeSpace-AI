@@ -64,3 +64,7 @@ cd frontend
 npm run build
 ```
 
+With both backend and frontend servers running, verify the 3D viewer:
+
+```bash
+cd frontend
