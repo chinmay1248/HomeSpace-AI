@@ -60,3 +60,7 @@ pytest
 Run the frontend production build:
 
 ```bash
+cd frontend
+npm run build
+```
+
