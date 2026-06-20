@@ -68,3 +68,7 @@ With both backend and frontend servers running, verify the 3D viewer:
 
 ```bash
 cd frontend
+npm run verify:viewer
+```
+
+The viewer script writes screenshots to `docs/verification`.
