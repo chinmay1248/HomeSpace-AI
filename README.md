@@ -1,175 +1,82 @@
-# MetaNest - AI-Powered 3D House Metaverse Generator
+# MetaNest
 
-MetaNest converts 2D house floor plans into interactive browser-based 3D environments. It combines a FastAPI/OpenCV backend with a React, Tailwind CSS, Three.js, and React Three Fiber frontend.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![React 18](https://img.shields.io/badge/react-18-blue.svg)](https://reactjs.org/)
+
+MetaNest (HomeScape AI) is a powerful, AI-assisted pipeline that converts 2D floor plans into interactive, browser-based 3D metaverse environments. It combines a FastAPI and OpenCV backend with a React, Tailwind CSS, and React Three Fiber frontend.
 
 ## Features
 
-- Drag-and-drop upload for JPG, PNG, and PDF floor plans
-- Upload preview, type validation, size validation, progress states, and API errors
-- OpenCV pipeline for grayscale conversion, thresholding, edge detection, Hough wall detection, room contours, and opening heuristics
-- Structured layout JSON with walls, rooms, doors, and windows
-- Interactive 3D generation from 2D coordinates
-- Orbit, top-view, and first-person walkthrough modes
-- WASD movement and bounded first-person navigation
-- Wall color, floor texture, and sunlight controls
-- Texture preset catalog served by the backend
-- Automatic room labels and simple furniture placement
-- Scene JSON export
-- FastAPI project persistence with MongoDB support and local JSON fallback
-- Optional YOLOv8 and U-Net training/inference scaffolds for production AI model artifacts
+- **2D Editor & Viewer:** Draw walls, add doors/windows/furniture manually, or instantly view generated plans in 3D.
+- **AI Vision Pipeline:** Upload JPG, PNG, or PDF blueprints and let the OpenCV pipeline automatically extract walls, detect room regions, and find openings.
+- **Interactive Metaverse:** Walk through your home in first-person mode, or explore it via top-down and orbit cameras.
+- **Dynamic Materials:** Customize wall colors, floor textures, and enable realistic sunlight simulation.
+- **Export Ready:** Download the generated 3D scene data as a standard JSON payload.
+- **Extensible AI:** Built-in hooks for integrating custom trained YOLOv8 (for doors/windows) and U-Net (for room segmentation) models.
 
-## Project Structure
+## Architecture Overview
 
-```text
-MetaNest/
-  backend/
-    app/
-      ai/                   optional YOLOv8 and U-Net inference wrappers
-      api/                  REST routes
-      core/                 settings
-      models/               Pydantic contracts
-      services/             upload, OpenCV, 3D scene generation
-      storage/              MongoDB/JSON repositories
-    scripts/                dataset preprocessing, training, and inference scripts
-    data/                   local project database fallback
-    uploads/                uploaded floor plans
-    tests/                  API smoke tests
-  frontend/
-    src/
-      components/           reusable UI and 3D viewer components
-      services/             API client
-      types/                shared TypeScript contracts
-      utils/                demo scene fallback
-  docs/
-    ROADMAP.md              living project board and progress tracker
+```mermaid
+graph TD
+    A[Frontend React Client] -->|Upload Image| B(FastAPI Backend)
+    B --> C{OpenCV / AI Pipeline}
+    C -->|Extract Walls| D[Hough Transform]
+    C -->|Segment Rooms| E[Contour Analysis / U-Net]
+    C -->|Detect Openings| F[Heuristics / YOLOv8]
+    D --> G[Geometry JSON]
+    E --> G
+    F --> G
+    G -->|Generate 3D Scene| H[React Three Fiber]
 ```
 
-## Backend Setup
+## Quick Start
+
+### 1. Backend Setup
+
+From the project root, open a terminal and run:
 
 ```bash
 cd backend
 python -m venv .venv
-.venv\Scripts\activate
+.venv\Scripts\activate       # On Windows
+# source .venv/bin/activate  # On macOS/Linux
 pip install -r requirements.txt
-copy .env.example .env
+copy .env.example .env       # cp .env.example .env on macOS/Linux
 uvicorn app.main:app --reload --port 8000
 ```
+The API is now running at `http://localhost:8000`.
 
-The API will run at `http://localhost:8000`.
+### 2. Frontend Setup
 
-### Optional MongoDB
-
-By default, projects are stored in `backend/data/projects.json`. To use MongoDB, set these values in `backend/.env`:
-
-```env
-MONGODB_URI=mongodb://localhost:27017
-MONGODB_DATABASE=metanest
-```
-
-## Frontend Setup
+Open a **new** terminal window and run:
 
 ```bash
 cd frontend
 npm install
-copy .env.example .env
 npm run dev
 ```
+The application is now running at `http://localhost:5173`.
 
-The app will run at `http://localhost:5173`.
+### 3. Demo Data
 
-## Demo Assets
+We have included a set of synthetic floor plans for testing. You can use the `Load Demo` button on the frontend or manually upload images located in `docs/demo-assets/dummy_raw/images`.
 
-The repo includes synthetic demo floor plans, YOLO labels, and room masks under `docs/demo-assets/dummy_raw`. See `docs/DEMO.md` for a local end-to-end walkthrough.
+## Advanced Configuration
 
-To regenerate the sample set:
+### Optional MongoDB Database
+By default, projects and layouts are stored locally in a `backend/data/projects.json` file. To use MongoDB for persistence (ideal for production):
+1. Create a cluster on MongoDB Atlas or run a local instance.
+2. Edit `backend/.env` and set `MONGODB_URI` and `MONGODB_DATABASE`.
 
-```bash
-python backend/scripts/generate_dummy_data.py --output docs/demo-assets/dummy_raw --num-images 3
-```
+### Optional AI Training
+The default application runs perfectly without GPUs using OpenCV heuristics. For production accuracy, you can train and plug in deep learning models:
+See `docs/AI_TRAINING_NEXT_STEPS.md` for a comprehensive guide on preparing datasets and training YOLOv8/U-Net models for MetaNest.
 
-## API
+## Contributing
 
-- `GET /health` - service health check
-- `POST /upload` - upload JPG, PNG, or PDF floor plan
-- `POST /analyze` - run OpenCV analysis for a project
-- `POST /generate3d` - generate browser-ready scene data
-- `GET /projects` - list saved projects
-- `GET /projects/{project_id}` - fetch one project
-- `GET /textures` - list supported material/texture presets
-- `PATCH /projects/{project_id}/materials` - save wall, floor, and sunlight settings
+See [CONTRIBUTING.md](CONTRIBUTING.md) for information about development workflows, code style, and submitting pull requests.
 
-## Optional AI Training
+## License
 
-The default MVP runs with OpenCV and rule-based geometry, which keeps local setup light. To train or run learned detectors, install the AI extras:
-
-See `docs/AI_TRAINING_NEXT_STEPS.md` for the production training checklist.
-
-```bash
-cd backend
-pip install -r requirements-ai.txt
-```
-
-YOLOv8 door/window workflow:
-
-```bash
-python scripts/preprocess_cubicasa_openings.py --images path\to\images --labels path\to\labels --output data\openings
-python scripts/train_yolo_openings.py --data data\openings\dataset.yaml --epochs 80
-python scripts/infer_yolo_openings.py --image sample.png --model runs\metanest-openings\doors-windows\weights\best.pt
-```
-
-U-Net room segmentation workflow:
-
-```bash
-python scripts/train_unet_rooms.py --images path\to\images --masks path\to\masks --output models\unet_rooms.pt
-python scripts/infer_unet_rooms.py --image sample.png --model models\unet_rooms.pt --output room_mask.png
-```
-
-Enable trained artifacts in `backend/.env`:
-
-```env
-YOLO_OPENING_MODEL_PATH=models/openings.pt
-UNET_ROOM_MODEL_PATH=models/unet_rooms.pt
-```
-
-## Layout JSON
-
-```json
-{
-  "walls": [
-    {
-      "start": [0, 0],
-      "end": [10, 0],
-      "thickness": 0.18,
-      "confidence": 0.82
-    }
-  ],
-  "rooms": [],
-  "doors": [],
-  "windows": []
-}
-```
-
-## Development Notes
-
-The OpenCV detector uses practical heuristics that work well as an MVP for clean blueprints and scanned plans. For production accuracy, the next architectural step is to add trained segmentation models for wall/opening detection and a calibration step for scale inference.
-
-Deployment targets:
-
-- Frontend: Vercel. Set `VITE_API_URL` to the deployed backend URL.
-- Backend: Render or Railway. Start with `uvicorn app.main:app --host 0.0.0.0 --port $PORT`.
-- Database: MongoDB Atlas. Set `MONGODB_URI` and `MONGODB_DATABASE`.
-- AI artifacts: store trained weights on persistent backend storage or object storage mounted/downloaded during release.
-
-## Verification
-
-```bash
-cd backend
-pytest
-
-cd ../frontend
-npm run build
-npm run verify:viewer
-```
-
-The viewer verification script expects the frontend dev server to be running and writes desktop/mobile screenshots to `docs/verification`.
-
+This project is licensed under the [MIT License](LICENSE).
