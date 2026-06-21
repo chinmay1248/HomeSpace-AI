@@ -15,11 +15,29 @@ from app.ai.ocr_reader import ocr_reader
 
 
 class FloorPlanAnalyzer:
+    """
+    Core image processing pipeline that converts a 2D floor plan image into structured geometry.
+    
+    It uses OpenCV for preprocessing, contour detection for rooms, and Hough Transform for walls.
+    Optional AI models (YOLOv8 and U-Net) can be provided to override the heuristic fallbacks
+    for opening detection and room segmentation respectively.
+    """
+
     def __init__(self, yolo_opening_model_path: str | None = None, unet_room_model_path: str | None = None) -> None:
         self.opening_detector = YOLOOpeningDetector(yolo_opening_model_path)
         self.room_segmenter = UNetRoomSegmenter(unet_room_model_path)
 
     def analyze(self, file_path: Path) -> LayoutAnalysis:
+        """
+        Run the full analysis pipeline on a floor plan image (JPG, PNG, or PDF).
+        
+        Args:
+            file_path: Absolute path to the floor plan file.
+            
+        Returns:
+            LayoutAnalysis: Structured layout containing normalized walls, rooms, doors, 
+            windows, and text labels with a calculated physical scale.
+        """
         image = self._load_image(file_path)
         height, width = image.shape[:2]
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -143,26 +161,48 @@ class FloorPlanAnalyzer:
     def _merge_similar_lines(self, lines: list[tuple[int, int, int, int]]) -> list[tuple[int, int, int, int]]:
         horizontal: dict[int, list[tuple[int, int, int, int]]] = {}
         vertical: dict[int, list[tuple[int, int, int, int]]] = {}
-        bucket = 10
+        bucket = 15
+        max_gap = 20
 
         for x1, y1, x2, y2 in lines:
             if abs(y2 - y1) <= abs(x2 - x1):
+                if x1 > x2:
+                    x1, y1, x2, y2 = x2, y2, x1, y1
                 key = round(((y1 + y2) / 2) / bucket)
                 horizontal.setdefault(key, []).append((x1, y1, x2, y2))
             else:
+                if y1 > y2:
+                    x1, y1, x2, y2 = x2, y2, x1, y1
                 key = round(((x1 + x2) / 2) / bucket)
                 vertical.setdefault(key, []).append((x1, y1, x2, y2))
 
         merged: list[tuple[int, int, int, int]] = []
+
         for grouped in horizontal.values():
-            xs = [x for line in grouped for x in (line[0], line[2])]
-            ys = [y for line in grouped for y in (line[1], line[3])]
-            merged.append((min(xs), round(sum(ys) / len(ys)), max(xs), round(sum(ys) / len(ys))))
+            grouped.sort(key=lambda l: l[0])
+            current = list(grouped[0])
+            for nxt in grouped[1:]:
+                if nxt[0] <= current[2] + max_gap:
+                    current[2] = max(current[2], nxt[2])
+                    current[1] = round((current[1] + nxt[1]) / 2)
+                    current[3] = current[1]
+                else:
+                    merged.append((current[0], current[1], current[2], current[3]))
+                    current = list(nxt)
+            merged.append((current[0], current[1], current[2], current[3]))
 
         for grouped in vertical.values():
-            xs = [x for line in grouped for x in (line[0], line[2])]
-            ys = [y for line in grouped for y in (line[1], line[3])]
-            merged.append((round(sum(xs) / len(xs)), min(ys), round(sum(xs) / len(xs)), max(ys)))
+            grouped.sort(key=lambda l: l[1])
+            current = list(grouped[0])
+            for nxt in grouped[1:]:
+                if nxt[1] <= current[3] + max_gap:
+                    current[3] = max(current[3], nxt[3])
+                    current[0] = round((current[0] + nxt[0]) / 2)
+                    current[2] = current[0]
+                else:
+                    merged.append((current[0], current[1], current[2], current[3]))
+                    current = list(nxt)
+            merged.append((current[0], current[1], current[2], current[3]))
 
         return sorted(merged, key=lambda line: math.dist((line[0], line[1]), (line[2], line[3])), reverse=True)
 
