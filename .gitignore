@@ -1,16 +1,41 @@
+# Dependencies
 node_modules/
+.venv/
+venv/
+
+# Build output
 dist/
 .vite/
 *.tsbuildinfo
-*.log
-.env
-.venv/
-venv/
+
+# Python cache
 __pycache__/
 *.pyc
 .pytest_cache/
 pytest-cache-files-*/
+
+# Environment
+.env
+
+# Logs
+*.log
+
+# Model weights
+*.pt
+*.pth
+runs/
+
+# Uploaded files and local data
 backend/uploads/*
 !backend/uploads/.gitkeep
 backend/data/*
 !backend/data/.gitkeep
+
+# Generated verification screenshots
+docs/verification/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
