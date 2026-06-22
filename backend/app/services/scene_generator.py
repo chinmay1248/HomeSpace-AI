@@ -4,7 +4,19 @@ from app.models.schemas import LayoutAnalysis, MaterialSettings
 
 
 class SceneGenerator:
+    """Generates the interactive 3D scene payload from analyzed 2D layouts."""
+
     def generate(self, layout: LayoutAnalysis, materials: MaterialSettings) -> dict:
+        """
+        Convert a 2D LayoutAnalysis into a ScenePayload format consumed by the React Three Fiber frontend.
+        
+        Args:
+            layout: The structured 2D layout geometry.
+            materials: User-defined material preferences for walls, floors, and lighting.
+            
+        Returns:
+            dict: The complete scene definition including bounds and camera features.
+        """
         bounds = self._bounds(layout)
         return {
             "version": "1.0",
