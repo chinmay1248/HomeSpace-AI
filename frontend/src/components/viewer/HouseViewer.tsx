@@ -3,7 +3,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { ContactShadows, Html, OrbitControls, PointerLockControls, Sky, Text } from '@react-three/drei';
 import { Color, DoubleSide, Vector3 } from 'three';
 import { Eye, Footprints, Maximize2 } from 'lucide-react';
-import type { MaterialSettings, Point2D, Room, ScenePayload, ViewMode, Wall } from '../../types/metanest';
+import type { MaterialSettings, Opening, Point2D, Room, ScenePayload, ViewMode, Wall } from '../../types/metanest';
 
 interface HouseViewerProps {
   scene: ScenePayload;
@@ -63,18 +63,24 @@ function SceneContent({ scene, materials, viewMode }: { scene: ScenePayload; mat
       {scene.rooms.map((room) => (
         <RoomLabel key={room.id} room={room} />
       ))}
-      {scene.doors.map((door) => (
-        <mesh key={door.id} position={[door.center[0], 1.05, door.center[1]]}>
-          <boxGeometry args={[door.width, 2.1, 0.08]} />
-          <meshStandardMaterial color="#111827" transparent opacity={0.36} />
-        </mesh>
-      ))}
-      {scene.windows.map((window) => (
-        <mesh key={window.id} position={[window.center[0], 1.65, window.center[1]]}>
-          <boxGeometry args={[window.width, 0.9, 0.06]} />
-          <meshPhysicalMaterial color="#8DEBFF" transparent opacity={0.45} roughness={0.08} transmission={0.2} />
-        </mesh>
-      ))}
+      {scene.doors.map((door) => {
+        const angle = getOpeningAngle(door, scene.walls);
+        return (
+          <mesh key={door.id} position={[door.center[0], 1.05, door.center[1]]} rotation={[0, angle, 0]}>
+            <boxGeometry args={[door.width, 2.1, 0.12]} />
+            <meshStandardMaterial color="#111827" transparent opacity={0.36} />
+          </mesh>
+        );
+      })}
+      {scene.windows.map((window) => {
+        const angle = getOpeningAngle(window, scene.walls);
+        return (
+          <mesh key={window.id} position={[window.center[0], 1.65, window.center[1]]} rotation={[0, angle, 0]}>
+            <boxGeometry args={[window.width, 0.9, 0.10]} />
+            <meshPhysicalMaterial color="#8DEBFF" transparent opacity={0.45} roughness={0.08} transmission={0.2} />
+          </mesh>
+        );
+      })}
       <Furniture rooms={scene.rooms} />
       <ContactShadows position={[0, 0.02, 0]} scale={50} blur={2.5} opacity={0.35} />
       {viewMode === 'orbit' || viewMode === 'top' ? <OrbitControls makeDefault enablePan enableZoom enableRotate={viewMode !== 'top'} /> : <PointerLockControls />}
@@ -250,4 +256,41 @@ function textureColor(texture: MaterialSettings['floor_texture']) {
     concrete: '#737B82',
     paint: '#C7F9CC',
   }[texture];
+}
+
+function getOpeningAngle(opening: Opening, walls: Wall[]) {
+  if (opening.wall_index !== undefined && opening.wall_index !== null && walls[opening.wall_index]) {
+    const wall = walls[opening.wall_index];
+    const [sx, sy] = wall.start;
+    const [ex, ey] = wall.end;
+    return -Math.atan2(ey - sy, ex - sx);
+  }
+
+  // Fallback to nearest wall
+  let minDistance = Infinity;
+  let bestAngle = 0;
+  const [ox, oy] = opening.center;
+
+  for (const wall of walls) {
+    const [sx, sy] = wall.start;
+    const [ex, ey] = wall.end;
+    const dx = ex - sx;
+    const dy = ey - sy;
+    const l2 = dx * dx + dy * dy;
+
+    let t = 0;
+    if (l2 !== 0) {
+      t = Math.max(0, Math.min(1, ((ox - sx) * dx + (oy - sy) * dy) / l2));
+    }
+    const px = sx + t * dx;
+    const py = sy + t * dy;
+    const dist = Math.hypot(ox - px, oy - py);
+
+    if (dist < minDistance) {
+      minDistance = dist;
+      bestAngle = -Math.atan2(dy, dx);
+    }
+  }
+
+  return bestAngle;
 }
