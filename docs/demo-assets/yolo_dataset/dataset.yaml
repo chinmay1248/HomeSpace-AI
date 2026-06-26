@@ -1,0 +1,11 @@
+path: E:/Projects/HomeScape AI/docs/demo-assets/yolo_dataset
+train: images/train
+val: images/val
+names:
+  0: door
+  1: window
+  2: bed
+  3: toilet
+  4: sink
+  5: stove
+  6: dining_table
